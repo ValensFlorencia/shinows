@@ -39,6 +39,9 @@ class _PostScreenState extends State<PostScreen> {
     'https://i.pinimg.com/736x/39/dd/9a/39dd9a62af6558596a7e3c0cb457182c.jpg',
   ];
 
+  List<bool> isImagePressed =
+      List.generate(16, (_) => false); // Menyimpan status gambar yang ditekan
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -93,8 +96,8 @@ class _PostScreenState extends State<PostScreen> {
                   color: Colors.grey[200],
                   child: Image.network(
                     'https://i.pinimg.com/736x/39/dd/9a/39dd9a62af6558596a7e3c0cb457182c.jpg',
-                    width: 400,
-                    height: 400,
+                    width: 400, // Ukuran lebar gambar
+                    height: 400, // Ukuran tinggi gambar
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -104,13 +107,23 @@ class _PostScreenState extends State<PostScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Row(
-              children: const [
-                Text(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
                   "Recents",
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
-                Spacer(),
-                Icon(Icons.camera_alt_outlined),
+                Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.photo_library_outlined),
+                      onPressed: () {
+                        // Aksi ketika ikon photo library ditekan
+                      },
+                    ),
+                    const Icon(Icons.camera_alt_outlined),
+                  ],
+                ),
               ],
             ),
           ),
@@ -130,11 +143,36 @@ class _PostScreenState extends State<PostScreen> {
               ),
               itemCount: recentImages.length,
               itemBuilder: (context, index) {
-                return Container(
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: NetworkImage(recentImages[index]),
-                      fit: BoxFit.cover,
+                return GestureDetector(
+                  onTapDown: (_) {
+                    setState(() {
+                      isImagePressed[index] =
+                          true; // Menandai gambar yang sedang ditekan
+                    });
+                  },
+                  onTapUp: (_) {
+                    setState(() {
+                      isImagePressed[index] =
+                          false; // Mengembalikan status gambar
+                    });
+                  },
+                  onTapCancel: () {
+                    setState(() {
+                      isImagePressed[index] =
+                          false; // Mengembalikan status gambar jika tap dibatalkan
+                    });
+                  },
+                  child: Opacity(
+                    opacity: isImagePressed[index]
+                        ? 0.5
+                        : 1.0, // Mengatur opacity saat gambar ditekan
+                    child: Container(
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: NetworkImage(recentImages[index]),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
                     ),
                   ),
                 );
